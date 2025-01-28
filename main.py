@@ -1,6 +1,6 @@
 import cv2
 import threading
-from flask import Flask, Response
+from flask import Flask, Response, render_template_string
 
 # Flask-приложение
 app = Flask(__name__)
@@ -9,19 +9,40 @@ app = Flask(__name__)
 current_frame = None
 lock = threading.Lock()  # Для синхронизации доступа к кадру
 
+# HTML-шаблон для отображения четырёх потоков
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Многокамерный поток</title>
+</head>
+<body>
+    <h1>Четыре видеопотока с одной камеры</h1>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div><img src="/video_feed/0" width="100%"></div>
+        <div><img src="/video_feed/1" width="100%"></div>
+        <div><img src="/video_feed/2" width="100%"></div>
+        <div><img src="/video_feed/3" width="100%"></div>
+    </div>
+</body>
+</html>
+"""
+
 # Функция для получения кадров с камеры (в отдельном потоке)
-def camera_thread(camera_index):
+def camera_thread():
     global current_frame
-    cap = cv2.VideoCapture(camera_index)  # Индекс камеры
+    cap = cv2.VideoCapture(0)  # Индекс камеры (одна камера)
 
     if not cap.isOpened():
-        print(f"Не удалось открыть камеру {camera_index}")
+        print("Не удалось открыть камеру 0")
         return
 
     while True:
         success, frame = cap.read()
         if not success:
-            print(f"Ошибка получения кадра с камеры {camera_index}")
+            print("Ошибка получения кадра с камеры 0")
             break
 
         # Обновляем текущий кадр
@@ -47,18 +68,17 @@ def generate_frames():
 # Роут для главной страницы
 @app.route('/')
 def index():
-    return "Перейдите на <a href='/video_feed'>/video_feed</a> для просмотра потока."
+    return render_template_string(HTML_TEMPLATE)
 
 # Роут для видеопотока
-@app.route('/video_feed')
-def video_feed():
+@app.route('/video_feed/<int:camera_index>')
+def video_feed(camera_index):
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # Запуск Flask-сервера
 if __name__ == '__main__':
     # Запускаем поток для захвата кадров
-    camera_index = 0  # Индекс камеры
-    threading.Thread(target=camera_thread, args=(camera_index,), daemon=True).start()
+    threading.Thread(target=camera_thread, daemon=True).start()
 
     # Запускаем Flask-сервер
     app.run(host='0.0.0.0', port=5000)
