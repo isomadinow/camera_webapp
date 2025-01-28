@@ -1,6 +1,7 @@
-from app import create_app
+from app import create_app  # Импортируем функцию создания приложения
 
-app = create_app()
+app = create_app()  # Создаём экземпляр Flask-приложения
 
+# Запуск приложения
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)  # Запускаем сервер на порту 5000
