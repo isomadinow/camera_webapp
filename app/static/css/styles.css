@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #333;
+    margin: 20px;
+}
+
+.video-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Две колонки */
+    grid-template-rows: auto auto; /* Две строки */
+    gap: 10px; /* Отступы между блоками */
+    padding: 20px;
+}
+
+.video-container div:nth-child(1) {
+    grid-column: 1 / span 2; /* Первый элемент занимает две колонки */
+    height: 150px; /* Фиксированная высота */
+}
+
+.video-container div:nth-child(2),
+.video-container div:nth-child(3) {
+    grid-column: span 1; /* Второй и третий элементы занимают по одной колонке */
+    height: 200px; /* Высота второго ряда */
+}
+
+.video-container div:nth-child(4) {
+    grid-column: 1 / span 2; /* Четвёртый элемент занимает две колонки */
+    height: 250px; /* Фиксированная высота */
+}
+
+.video-container div img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Видео заполняет блок */
+    border: 2px solid #333;
+    border-radius: 8px;
+}
