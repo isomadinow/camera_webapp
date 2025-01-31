@@ -1,16 +1,22 @@
-from flask import Blueprint, jsonify
-from app.services.camera_service import start_cameras_from_reports, stop_all_cameras
+from flask import Blueprint, jsonify, request
+from app.services.camera_service import start_cameras_for_truck, stop_all_cameras
 
 camera_bp = Blueprint("camera", __name__)
 
-@camera_bp.route("/api/cameras/start", methods=["POST"])
+@camera_bp.route("/api/start_cameras", methods=["POST"])
 def start_cameras():
-    """Запускает камеры на основе reports"""
-    result = start_cameras_from_reports()
-    return jsonify(result), 200
+    """Запускает камеры для выбранного грузовика."""
+    data = request.json
+    truck_number = data.get("truck_number")
 
-@camera_bp.route("/api/cameras/stop", methods=["POST"])
+    if not truck_number:
+        return jsonify({"error": "Не указан номер грузовика"}), 400
+
+    result = start_cameras_for_truck(truck_number)
+    return jsonify(result)
+
+@camera_bp.route("/api/stop_cameras", methods=["POST"])
 def stop_cameras():
-    """Останавливает все камеры"""
+    """Останавливает все камеры."""
     stop_all_cameras()
-    return jsonify({"message": "Камеры остановлены"}), 200
+    return jsonify({"message": "Все камеры остановлены"})

@@ -9,7 +9,7 @@ truck_bp = Blueprint("truck", __name__)
 def get_all_trucks():
     trucks = TruckModel.get_all()
     return jsonify([
-        {"id": truck.id, "name": truck.name, "stateNumber": truck.stateNumber}
+        {"id": truck.Id, "name": truck.Name, "stateNumber": truck.StateNumber}
         for truck in trucks
     ])
 
@@ -19,17 +19,5 @@ def get_truck(truck_id):
     truck = TruckModel.get_by_id(truck_id)
     if not truck:
         return jsonify({"error": "Грузовик не найден"}), 404
-    return jsonify({"id": truck.id, "name": truck.name, "stateNumber": truck.stateNumber})
+    return jsonify({"id": truck.Id, "name": truck.Name, "stateNumber": truck.StateNumber})
 
-# Добавить новый грузовик
-@truck_bp.route("/api/trucks", methods=["POST"])
-def add_truck():
-    data = request.json
-    if not data.get("name") or not data.get("stateNumber"):
-        return jsonify({"error": "name и stateNumber обязательны"}), 400
-
-    truck = TruckModel(Name=data["name"], StateNumber=data["stateNumber"])
-    db.session.add(truck)
-    db.session.commit()
-    
-    return jsonify({"message": "Грузовик добавлен", "id": truck.id}), 201
