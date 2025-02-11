@@ -1,3 +1,9 @@
+import sys
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+opencv_path = os.path.join(BASE_DIR, "opencv/build/lib/python3")
+sys.path.insert(0, opencv_path)
+
 import cv2
 import threading
 from app.models.camera_model import CameraModel
@@ -20,16 +26,16 @@ class CameraThread:
 
     def _capture_frames(self):
         """Запуск потока для получения видео."""
+        
+        pipeline = (
+                    f'udpsrc port={self.camera_index} ! '
+                    'application/x-rtp, encoding-name=H264, payload=96 ! '
+                    'rtph264depay ! decodebin ! videoconvert ! appsink sync=false'
+                )
         print(f"📡 Открываем камеру {self.camera_type} (порт {self.camera_index})...")
-        cap = cv2.VideoCapture(
-            f'udpsrc port={self.camera_index} '
-            f'caps="application/x-rtp, media=(string)video, '
-            f'clock-rate=(int)90000, encoding-name=(string)H264, '
-            f'payload=(int)96" ! rtph264depay ! '
-            f'decodebin ! videoconvert ! appsink',
+        cap = cv2.VideoCapture(pipeline,
             cv2.CAP_GSTREAMER
         )
-
         if not cap.isOpened():
             print(f"❌ Ошибка: Камера {self.camera_type} (порт {self.camera_index}) не открылась!")
             self.running = False
