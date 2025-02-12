@@ -1,2 +1,4 @@
-Flask==2.3.2  # Веб-фреймворк для создания приложения
-opencv-python==4.8.0.76  # Библиотека для работы с камерой
+Flask==3.1.0
+flask_sqlalchemy==3.1.1
+opencv_python==4.11.0.86
+psycopg2-binary==2.9.10
