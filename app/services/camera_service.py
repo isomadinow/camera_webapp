@@ -1,5 +1,6 @@
 import cv2
 import threading
+import time
 from app.models.camera_model import CameraModel
 from app.models.truck_model import TruckModel
 from app.services.report_service import get_trucks_with_cameras
@@ -15,6 +16,9 @@ class CameraThread:
         self.current_frame = None
         self.lock = threading.Lock()
         self.running = True
+        self.recording = False
+        self.recording_thread = None
+        self.video_writer = None
         self.thread = threading.Thread(target=self._capture_frames, daemon=True)
         self.thread.start()
 
@@ -42,8 +46,9 @@ class CameraThread:
             if success:
                 with self.lock:
                     self.current_frame = frame
+                if self.recording and self.video_writer:
+                    self.video_writer.write(frame)
         cap.release()
-
 
     def get_frame(self):
         """Возвращает последний кадр камеры."""
@@ -54,6 +59,47 @@ class CameraThread:
         """Останавливает поток камеры."""
         self.running = False
         self.thread.join()
+        self.stop_recording()
+
+    def start_recording(self, output_path, duration_seconds=60):
+        """Начинает запись видео с камеры."""
+        if self.recording:
+            print(f"⚠️ Камера {self.camera_type} уже записывает видео.")
+            return
+
+        self.recording = True
+        self.recording_thread = threading.Thread(
+            target=self._record_video, 
+            args=(output_path, duration_seconds),
+            daemon=True
+        )
+        self.recording_thread.start()
+
+    def _record_video(self, output_path, duration_seconds):
+        """Внутренний метод для записи видео."""
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fps = 20.0
+        frame_size = (640, 480)
+
+        self.video_writer = cv2.VideoWriter(output_path, fourcc, fps, frame_size)
+
+        print(f"🎥 Начата запись с камеры {self.camera_type} на {duration_seconds} секунд...")
+
+        start_time = time.time()
+        while self.recording and (time.time() - start_time) < duration_seconds:
+            time.sleep(0.05)
+
+        self.stop_recording()
+
+    def stop_recording(self):
+        """Останавливает запись видео."""
+        if self.recording:
+            self.recording = False
+            if self.video_writer:
+                self.video_writer.release()
+                self.video_writer = None
+            print(f"🛑 Запись с камеры {self.camera_type} остановлена.")
+
 
 def start_cameras_for_truck(truck_number):
     """Запускает камеры для указанного грузовика."""
@@ -99,3 +145,6 @@ def stop_all_cameras():
 def get_camera_frames():
     """Возвращает текущие кадры со всех камер."""
     return {cam_type: cam.get_frame() for cam_type, cam in active_cameras.items()}
+
+# Пример использования записи видео
+# active_cameras['front'].start_recording('output_front.avi', duration_seconds=120)
