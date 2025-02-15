@@ -1,4 +1,3 @@
-# app/controllers/camera_controller.py
 from flask import Blueprint, jsonify, request, Response
 from app.services.camera_service import (
     start_cameras_for_truck,

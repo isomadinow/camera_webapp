@@ -1,4 +1,3 @@
-# app/services/camera_service.py
 import sys
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
