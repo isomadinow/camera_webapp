@@ -65,9 +65,10 @@ def start_cameras_for_truck(truck_number):
     global active_cameras
     stop_all_cameras()
 
-    truck = TruckModel.get_by_state_number(truck_number)
-    if not truck:
-        return {"error": "Грузовик не найден"}
+    if truck_number not in ["10", "11"]:
+        truck = TruckModel.get_by_state_number(truck_number)
+        if not truck:
+            return {"error": "Грузовик не найден"}
 
     # Предположим, get_trucks_with_cameras() -> [id, stateNumber, front_port, back_port, left_port, right_port]
     truck_data = get_trucks_with_cameras()
@@ -78,7 +79,7 @@ def start_cameras_for_truck(truck_number):
 
     _, _, front_port, back_port, left_port, right_port = cameras
 
-    print(f"🚛 Запуск камер для {truck.Name} ({truck.StateNumber}): front={front_port}, back={back_port}, left={left_port}, right={right_port}")
+    print(f"🚛 Запуск камер: front={front_port}, back={back_port}, left={left_port}, right={right_port}")
 
     # Запускаем 4 потока CameraThread
     active_cameras = {
