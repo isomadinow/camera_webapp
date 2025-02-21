@@ -89,57 +89,45 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 5. Запись видео (пример)
-    function startRecording() {
-        const cameraType = prompt("Камера (front, back, left, right):");
-        const outputPath = prompt("Путь для записи (например, output.avi):");
-        const duration = parseInt(prompt("Длительность записи (секунд):", "60"), 10);
-
-        if (!cameraType || !outputPath) {
-            alert("Необходимо указать камеру и путь для записи!");
-            return;
+// Начать запись всех камер
+function startRecording() {
+    fetch("/api/start_recording", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            alert(data.message);
         }
+    })
+    .catch(error => {
+        console.error("Ошибка при запуске записи:", error);
+        alert("❌ Не удалось начать запись!");
+    });
+}
 
-        fetch("/api/record", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                camera_type: cameraType,
-                action: "start",
-                output_path: outputPath,
-                duration_seconds: duration || 60
-            })
-        })
-        .then(response => response.json())
-        .then(data => alert(data.message))
-        .catch(error => {
-            console.error("Ошибка запуска записи:", error);
-            alert("Ошибка запуска записи!");
-        });
-    }
-
-    function stopRecording() {
-        const cameraType = prompt("Введите камеру для остановки записи (front, back, left, right):");
-        if (!cameraType) {
-            alert("Необходимо указать камеру!");
-            return;
+// Остановить запись всех камер
+function stopRecording() {
+    fetch("/api/stop_recording", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            alert(data.message);
         }
-
-        fetch("/api/record", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                camera_type: cameraType,
-                action: "stop"
-            })
-        })
-        .then(response => response.json())
-        .then(data => alert(data.message))
-        .catch(error => {
-            console.error("Ошибка остановки записи:", error);
-            alert("Ошибка остановки записи!");
-        });
-    }
+    })
+    .catch(error => {
+        console.error("Ошибка при остановке записи:", error);
+        alert("❌ Не удалось остановить запись!");
+    });
+}
 
     // 6. Привязываем события к кнопкам
     loadTrucksButton.addEventListener("click", loadTrucks);
