@@ -7,7 +7,7 @@ start_stream() {
 }
 
 
-for PORT in 2001 2002 2003 2004; do
+for PORT in 2025 2026 2027 2028; do
     echo "Запускаем GStreamer на порту $PORT..."
     start_stream $PORT
 done
