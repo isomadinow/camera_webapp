@@ -1,8 +1,8 @@
 import sys
 import os
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-opencv_path = os.path.join(BASE_DIR, "../../opencv/build/lib/python3")
-sys.path.insert(0, opencv_path)
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# opencv_path = os.path.join(BASE_DIR, "../../opencv/build/lib/python3")
+# sys.path.insert(0, opencv_path)
 
 import cv2
 import threading
@@ -42,6 +42,7 @@ class CameraThread:
 
         while self.running:
             success, frame = cap.read()
+            print(f'{self.camera_index}, {success}')
             if success:
                 with self.lock:
                     self.current_frame = frame
