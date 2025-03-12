@@ -10,7 +10,7 @@ from app.controllers.view_controller import view_bp
 # Функция для создания и конфигурации приложения Flask
 def create_app():
     app = Flask(__name__, template_folder='views/')  # Указываем папку для HTML-шаблонов
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "postgresql://csd_server:csd_server@172.20.76.82:5432/DispatcherXDb_test2")
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "postgresql://csd_server:csd_server@172.20.76.82:5432/DispatcherXDb")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     # Инициализация БД
     db.init_app(app)
